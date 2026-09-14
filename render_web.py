@@ -72,9 +72,24 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 self.send_json({'ok': False, 'error': str(exc)}, 503)
             return
+        if parsed.path == '/execute':
+            supplied = self.headers.get('X-Cron-Secret', '') or (query.get('secret') or [''])[0]
+            if not CRON_SECRET or supplied != CRON_SECRET:
+                self.send_json({'ok': False, 'error': 'unauthorized'}, 401)
+                return
+            try:
+                from live_executor import execute_buy
+                self.send_json(execute_buy())
+            except Exception as exc:
+                self.send_json({'ok': False, 'status': 'executor_error', 'error': str(exc)}, 503)
+            return
         if parsed.path == '/status':
             try:
-                self.send_json(status())
+                current = status()
+                current['executor_endpoint'] = '/execute'
+                current['target_configured'] = bool(os.getenv('TARGET_LAUNCH_ADDRESS', '').strip())
+                current['burner_configured'] = bool(os.getenv('BURNER_PRIVATE_KEY', '').strip())
+                self.send_json(current)
             except Exception as exc:
                 self.send_json({'ok': False, 'error': str(exc)}, 503)
             return

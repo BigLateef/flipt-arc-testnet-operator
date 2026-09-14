@@ -1,1 +1,1 @@
-# Standard-library only bootstrap; no third-party packages required.
+eth-account>=0.13,<0.14

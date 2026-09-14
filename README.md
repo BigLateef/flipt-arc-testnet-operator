@@ -59,9 +59,9 @@ Those switches remain required for later milestones. Transaction code will not b
 4. Create a cron-job.org GET request to the deployed service's `/tick` path every minute or five minutes, passing the configured secret.
 5. Confirm `/health` returns `chain_match: true` and `/status` returns the latest block.
 
-The cron tick is the worker trigger; there is no separate Free Background Worker. The service must persist state in Postgres before we rely on it for event history, because Render Free filesystems are ephemeral and services can restart or spin down. This bootstrap remains read-only.
+The cron tick is the monitor trigger; there is no separate Free Background Worker. `/execute` is a separate secret-protected, one-call endpoint for the configured first buy. Do not attach `/execute` to the recurring cron job. The service must persist state in Postgres before we rely on it for event history, because Render Free filesystems are ephemeral and services can restart or spin down.
 
-Verified Arc testnet addresses and high-confidence selectors are recorded in `contracts.json`. Launch, unbond, and limit-order creation remain fail-closed until their exact ABI tuples are independently verified.
+Verified Arc testnet addresses and high-confidence selectors are recorded in `contracts.json`. The buy executor requires a positive `MIN_TOKENS_OUT`, performs exact USDC approval only, checks chain/balance/gas/caps, and remains fail-closed when live switches or burner configuration are absent. Launch, unbond, and limit-order creation remain blocked until their exact ABI tuples are independently verified.
 
 ## Next milestone
 
