@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flipt Termux Operator</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#0b0f14;color:#e9eef5;max-width:720px;margin:0 auto;padding:24px}
+    h1{font-size:24px}.card{background:#151c25;border:1px solid #293544;border-radius:14px;padding:16px;margin:14px 0}
+    button{background:#b7f34a;border:0;border-radius:9px;padding:12px 16px;font-weight:700;color:#101510}
+    .ok{color:#b7f34a}.bad{color:#ff8b8b}.muted{color:#aab6c5}code{word-break:break-all}
+    dt{color:#aab6c5;margin-top:10px}dd{margin:3px 0 0}
+  </style>
+</head>
+<body>
+  <h1>Flipt Termux Operator</h1>
+  <p class="muted">Read-only bootstrap. No transaction methods are enabled.</p>
+  <div class="card">
+    <button id="connect">Connect Rabby</button>
+    <p id="wallet" class="muted">Wallet not connected</p>
+  </div>
+  <div class="card">
+    <h2>RPC health</h2>
+    <dl id="health"><dd>Checking…</dd></dl>
+  </div>
+  <div class="card">
+    <h2>Safety</h2>
+    <p class="ok">DRY_RUN=1</p>
+    <p class="ok">LIVE_TRADING=0</p>
+    <p class="muted">This page cannot create, approve, sign, or broadcast a transaction.</p>
+  </div>
+<script>
+const EXPECTED = 5042002;
+const $ = (id) => document.getElementById(id);
+function hexToInt(x){return parseInt(x,16)}
+function usdc18(n){return (Number(n)/1e18).toLocaleString(undefined,{maximumFractionDigits:6})}
+async function health(){
+  try{
+    const r=await fetch('/api/health',{cache:'no-store'}); const d=await r.json();
+    $('health').innerHTML = `
+      <dt>RPC</dt><dd><code>${d.rpc_url||'unavailable'}</code></dd>
+      <dt>RPC chain ID</dt><dd class="${d.chain_match?'ok':'bad'}">${d.rpc_chain_id??'—'} (expected ${d.expected_chain_id??EXPECTED})</dd>
+      <dt>Latest block</dt><dd>${d.latest_block??'—'}</dd>
+      <dt>Mode</dt><dd class="ok">read-only / dry-run</dd>`;
+  }catch(e){$('health').innerHTML='<dd class="bad">RPC health check failed</dd>'}
+}
+async function connect(){
+  if(!window.ethereum){$('wallet').textContent='Open this page inside Rabby mobile browser.';return}
+  try{
+    const accounts=await window.ethereum.request({method:'eth_requestAccounts'});
+    const chain=await window.ethereum.request({method:'eth_chainId'});
+    const address=accounts[0]||'';
+    $('wallet').innerHTML=`<span class="ok">Connected</span><br><code>${address}</code><br>Wallet chain ID: <b class="${hexToInt(chain)===EXPECTED?'ok':'bad'}">${hexToInt(chain)}</b>`;
+    if(address){
+      const bal=await window.ethereum.request({method:'eth_getBalance',params:[address,'latest']});
+      $('wallet').innerHTML += `<br>Native USDC: ${usdc18(BigInt(bal))}`;
+    }
+  }catch(e){$('wallet').textContent='Connection was rejected or unavailable.'}
+}
+$('connect').addEventListener('click',connect); health(); setInterval(health,15000);
+</script>
+</body>
+</html>

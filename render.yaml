@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: flipt-render-monitor
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python render_web.py
+    healthCheckPath: /health
+    envVars:
+      - key: ARC_RPC_URL
+        value: https://rpc.testnet.arc.io
+      - key: CHAIN_ID
+        value: "5042002"
+      - key: DRY_RUN
+        value: "1"
+      - key: LIVE_TRADING
+        value: "0"
+      - key: RUN_END_AT
+        sync: false
+      - key: CRON_SECRET
+        sync: false
