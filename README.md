@@ -56,10 +56,12 @@ Those switches remain required for later milestones. Transaction code will not b
 1. Put this folder in a separate GitHub repository.
 2. In Render, create a Blueprint from that repository.
 3. Set `CRON_SECRET` to a long random value and set `RUN_END_AT` to the real testnet deadline.
-4. Create a cron-job.org GET request to `https://YOUR-RENDER-DOMAIN/tick?secret=YOUR_SECRET` every minute or five minutes.
+4. Create a cron-job.org GET request to the deployed service's `/tick` path every minute or five minutes, passing the configured secret.
 5. Confirm `/health` returns `chain_match: true` and `/status` returns the latest block.
 
 The cron tick is the worker trigger; there is no separate Free Background Worker. The service must persist state in Postgres before we rely on it for event history, because Render Free filesystems are ephemeral and services can restart or spin down. This bootstrap remains read-only.
+
+Verified Arc testnet addresses and high-confidence selectors are recorded in `contracts.json`. Launch, unbond, and limit-order creation remain fail-closed until their exact ABI tuples are independently verified.
 
 ## Next milestone
 

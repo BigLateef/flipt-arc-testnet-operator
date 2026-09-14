@@ -1,0 +1,36 @@
+{
+  "chain_id": 5042002,
+  "rpc_url": "https://rpc.testnet.arc.io",
+  "hub": "0x4B33146F2bCc75574534374C85662f9E51C38Aca",
+  "factory": "0xb9200934941A9010d31733D034b9eAd7a7746d12",
+  "orders": "0x41d7F9CF646b70f7a99Cf62C6C456057C47Ef0E3",
+  "fee_config": "0x33aA390429C92D65cDca345a0191162bcE0cd9a6",
+  "usdc": "0x4F3b8005d6b3F4994a791D971bcD153E114D20c2",
+  "selectors": {
+    "buy": "0xa59ac6dd",
+    "sell": "0x6a272462",
+    "graduate": "0xff6d8d05",
+    "claim": "0x1e83409a",
+    "launch": "0xe43d45f0",
+    "pool_buy": "0xc3b88b53",
+    "unbond": "0xede94c22",
+    "launch_of": "0x029282d7",
+    "launches": "0x7b443a76",
+    "get_pair": "0xe6a43905",
+    "approve": "0x095ea7b3"
+  },
+  "verified_reads": {
+    "hub_usdc": "0x4F3b8005d6b3F4994a791D971bcD153E114D20c2",
+    "hub_orders": "0x41d7F9CF646b70f7a99Cf62C6C456057C47Ef0E3",
+    "hub_fee_config": "0x33aA390429C92D65cDca345a0191162bcE0cd9a6",
+    "factory_hub": "0x4B33146F2bCc75574534374C85662f9E51C38Aca"
+  },
+  "confidence_notes": {
+    "buy": "High; observed successful curve purchase call with address,uint256,uint256 calldata.",
+    "sell": "High; observed successful graduated-pool sell call.",
+    "claim": "High selector confidence; exact semantic argument must still be checked before autonomous use.",
+    "launch": "Medium operation confidence; exact ABI tuple unresolved.",
+    "unbond": "Medium-low; exact tuple unresolved.",
+    "limit_orders": "Exact create-order tuple unresolved."
+  }
+}
