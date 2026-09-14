@@ -16,8 +16,7 @@ from eth_account import Account
 RPC_URL = os.getenv('ARC_RPC_URL', 'https://rpc.testnet.arc.io')
 CHAIN_ID = int(os.getenv('CHAIN_ID', '5042002'))
 HUB = '0x4B33146F2bCc75574534374C85662f9E51C38Aca'
-# Arc Testnet uses native USDC at 0x3600... for balances and approvals.
-USDC = os.getenv('USDC_ADDRESS', '0x3600000000000000000000000000000000000000')
+USDC = '0x4F3b8005d6b3F4994a791D971bcD153E114D20c2'
 DRY_RUN = os.getenv('DRY_RUN', '1') == '1'
 LIVE_TRADING = os.getenv('LIVE_TRADING', '0') == '1'
 MAX_USDC_PER_LAUNCH = Decimal(os.getenv('MAX_USDC_PER_LAUNCH', '100'))
