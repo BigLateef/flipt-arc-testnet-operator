@@ -40,7 +40,7 @@ MIN_FDV_USD = Decimal(os.getenv('AUTO_MIN_FDV_USD', '2000'))
 INITIAL_FDV_USD = Decimal('2100')
 TOKEN_SUPPLY = 10**9 * 10**18
 MAX_AUTO_BUYS = int(os.getenv('MAX_AUTO_BUYS', '3'))
-AUTO_BUY_AMOUNT = min(Decimal(os.getenv('AUTO_BUY_USDC_AMOUNT', str(BUY_USDC_AMOUNT or '25'))), MAX_USDC_PER_LAUNCH)
+AUTO_BUY_AMOUNT = min(Decimal(os.getenv('AUTO_BUY_USDC_AMOUNT', '25')), MAX_USDC_PER_LAUNCH)
 STATE_PATH = Path(os.getenv('AUTO_STATE_PATH', 'auto_strategy_state.json'))
 END_AT = os.getenv('RUN_END_AT', '2026-09-16T02:00:00+01:00')
 
