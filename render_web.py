@@ -12,6 +12,7 @@ DRY_RUN = os.getenv('DRY_RUN', '1')
 LIVE_TRADING = os.getenv('LIVE_TRADING', '0')
 RUN_END_AT = os.getenv('RUN_END_AT', '')
 CRON_SECRET = os.getenv('CRON_SECRET', '')
+AUTO_BUY_LOOP = os.getenv('AUTO_BUY_LOOP', '1') == '1'
 PORT = int(os.getenv('PORT', '10000'))
 
 
@@ -68,9 +69,15 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({'ok': False, 'error': 'unauthorized'}, 401)
                 return
             try:
-                self.send_json({'ok': True, 'tick': status(), 'read_only': True})
+                result = {'ok': True, 'tick': status(), 'auto_buy_loop': AUTO_BUY_LOOP}
+                if AUTO_BUY_LOOP and LIVE_TRADING == '1' and DRY_RUN != '1':
+                    from strategy_loop import run_once
+                    result['strategy'] = run_once()
+                else:
+                    result['strategy'] = {'status': 'disabled'}
+                self.send_json(result)
             except Exception as exc:
-                self.send_json({'ok': False, 'error': str(exc)}, 503)
+                self.send_json({'ok': False, 'status': 'strategy_error', 'error': str(exc)}, 503)
             return
         if parsed.path == '/execute':
             supplied = self.headers.get('X-Cron-Secret', '') or (query.get('secret') or [''])[0]
@@ -87,6 +94,9 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 current = status()
                 current['executor_endpoint'] = '/execute'
+                current['auto_buy_loop'] = AUTO_BUY_LOOP
+                current['auto_min_fdv_usd'] = os.getenv('AUTO_MIN_FDV_USD', '2000')
+                current['max_auto_buys'] = os.getenv('MAX_AUTO_BUYS', '3')
                 current['target_configured'] = bool(os.getenv('TARGET_LAUNCH_ADDRESS', '').strip())
                 current['burner_configured'] = bool(os.getenv('BURNER_PRIVATE_KEY', '').strip())
                 self.send_json(current)
@@ -94,7 +104,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({'ok': False, 'error': str(exc)}, 503)
             return
         if self.path == '/':
-            body = '''<!doctype html><meta name="viewport" content="width=device-width"><title>Flipt Render</title><h1>Flipt Render bootstrap</h1><p>Read-only worker dashboard.</p><p><a href="/health">Health</a> · <a href="/status">Status</a></p><p>DRY_RUN=1 · LIVE_TRADING=0</p>'''.encode()
+            body = '''<!doctype html><meta name="viewport" content="width=device-width"><title>Flipt Render</title><h1>Flipt Render bootstrap</h1><p>Guarded launch discovery worker.</p><p><a href="/health">Health</a> · <a href="/status">Status</a></p>'''.encode()
             self.send_response(200); self.send_header('Content-Type','text/html'); self.send_header('Content-Length',str(len(body))); self.end_headers(); self.wfile.write(body); return
         self.send_error(404)
 
