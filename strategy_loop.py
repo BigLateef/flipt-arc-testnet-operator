@@ -30,8 +30,9 @@ AMOUNT = min(
     MAX_USDC_PER_LAUNCH,
 )
 MAX_BUYS = int(os.getenv("MAX_AUTO_BUYS", "3"))
-# Keep the existing one-buy-per-tick risk profile unless the operator raises it.
-BUYS_PER_TICK = max(1, int(os.getenv("AUTO_BUYS_PER_TICK", "1")))
+# Default burst throughput prevents qualifying launches from waiting behind a one-buy throttle.
+# Set AUTO_BUYS_PER_TICK explicitly to tune exposure; MAX_AUTO_BUYS remains the hard cap.
+BUYS_PER_TICK = max(1, int(os.getenv("AUTO_BUYS_PER_TICK", "5")))
 SCAN_BATCH = max(1, int(os.getenv("AUTO_SCAN_BATCH", "120")))
 STARTUP_BACKFILL = max(1, int(os.getenv("AUTO_STARTUP_BACKFILL", "500")))
 MAX_PENDING = max(100, int(os.getenv("AUTO_MAX_PENDING", "2000")))
