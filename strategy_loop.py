@@ -40,7 +40,7 @@ MIN_FDV_USD = Decimal(os.getenv('AUTO_MIN_FDV_USD', '2000'))
 INITIAL_FDV_USD = Decimal('2100')
 TOKEN_SUPPLY = 10**9 * 10**18
 MAX_AUTO_BUYS = int(os.getenv('MAX_AUTO_BUYS', '3'))
-AUTO_BUY_AMOUNT = Decimal(os.getenv('AUTO_BUY_USDC_AMOUNT', str(BUY_USDC_AMOUNT or '25')))
+AUTO_BUY_AMOUNT = min(Decimal(os.getenv('AUTO_BUY_USDC_AMOUNT', str(BUY_USDC_AMOUNT or '25'))), MAX_USDC_PER_LAUNCH)
 STATE_PATH = Path(os.getenv('AUTO_STATE_PATH', 'auto_strategy_state.json'))
 END_AT = os.getenv('RUN_END_AT', '2026-09-16T02:00:00+01:00')
 
@@ -138,8 +138,8 @@ def execute_auto_buy(launch):
         return {'ok': False, 'status': 'blocked', 'reason': 'live switches are not enabled'}
     if not PRIVATE_KEY:
         return {'ok': False, 'status': 'blocked', 'reason': 'burner is not configured'}
-    if AUTO_BUY_AMOUNT <= 0 or AUTO_BUY_AMOUNT > MAX_USDC_PER_LAUNCH:
-        return {'ok': False, 'status': 'blocked', 'reason': 'auto amount exceeds cap'}
+    if AUTO_BUY_AMOUNT <= 0:
+        return {'ok': False, 'status': 'blocked', 'reason': 'auto amount is zero'}
     account = Account.from_key(PRIVATE_KEY)
     owner = account.address
     amount_raw = int(AUTO_BUY_AMOUNT * Decimal(10**6))
@@ -154,7 +154,7 @@ def execute_auto_buy(launch):
         if DRY_RUN:
             return {'ok': True, 'status': 'approval_prepared', 'wallet': owner, 'token': launch['token']}
         tx_hash = sign_and_send(tx)
-        return {'ok': True, 'status': 'approval_broadcast', 'tx_hash': tx_hash, 'wallet': owner, 'token': launch['token']}
+        return {'ok': True, 'status': 'approval_broadcast', 'tx_hash': tx_hash, 'wallet': owner, 'token': launch['token'], 'amount_usdc': str(AUTO_BUY_AMOUNT)}
     min_out = min_tokens_out(launch)
     buy_data = '0xa59ac6dd' + word_address(launch['token']) + word_uint(amount_raw) + word_uint(min_out)
     tx = make_tx(owner, HUB, buy_data, nonce)
