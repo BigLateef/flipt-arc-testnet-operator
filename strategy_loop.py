@@ -3,10 +3,9 @@ from decimal import Decimal
 from pathlib import Path
 from eth_account import Account
 from live_executor import HUB, USDC, DRY_RUN, LIVE_TRADING, PRIVATE_KEY, MAX_USDC_PER_LAUNCH, call_rpc, read_uint, make_tx, sign_and_send, word_address, word_uint
-
 COUNT='27cca59f'; LIST='7b443a76'; STATE='029282d7'
 MIN_FDV=Decimal(os.getenv('AUTO_MIN_FDV_USD','2000'))
-AMOUNT=min(Decimal(os.getenv('AUTO_BUY_USDC_AMOUNT','25')), MAX_USDC_PER_LAUNCH)
+AMOUNT=min(Decimal(os.getenv('AUTO_BUY_USDC_AMOUNT',os.getenv('BUY_USDC_AMOUNT','25'))), MAX_USDC_PER_LAUNCH)
 MAX_BUYS=int(os.getenv('MAX_AUTO_BUYS','3'))
 PATH=Path(os.getenv('AUTO_STATE_PATH','auto_strategy_state.json'))
 END=os.getenv('RUN_END_AT','2026-09-16T02:00:00+01:00')
