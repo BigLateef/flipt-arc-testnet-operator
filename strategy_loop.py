@@ -125,11 +125,10 @@ def discover(limit=10):
 def min_tokens_out(launch):
     raised = Decimal(launch['raised_usdc'])
     sold = Decimal(launch['sold_tokens'])
-    amount_raw = int(AUTO_BUY_AMOUNT * Decimal(10**6))
     if raised > 0 and sold > 0:
-        expected = Decimal(amount_raw) * (sold * Decimal(10**18)) / (raised * Decimal(10**6))
+        expected = AUTO_BUY_AMOUNT * sold / raised
     else:
-        expected = (AUTO_BUY_AMOUNT / INITIAL_FDV_USD) * Decimal(TOKEN_SUPPLY)
+        expected = (AUTO_BUY_AMOUNT / INITIAL_FDV_USD) * Decimal(10**9)
     return max(1, int(expected * Decimal('0.90')))
 
 
