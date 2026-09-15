@@ -79,7 +79,7 @@ def parse_end():
         return 0
 
 
-def discover(limit=80):
+def discover(limit=10):
     count_result = selector_call(HUB, LAUNCH_COUNT_SELECTOR)
     words = decode_words(count_result)
     count = words[0] if words else 0
@@ -106,8 +106,6 @@ def discover(limit=80):
             continue
         raised_usdc = Decimal(values[2]) / Decimal(10**6)
         sold_tokens = Decimal(values[3]) / Decimal(10**18)
-        # The app's verified launch floor is about $2.1K. Once tokens are
-        # sold, average curve price gives a conservative FDV estimate.
         if sold_tokens > 0 and raised_usdc > 0:
             fdv = (raised_usdc * Decimal(10**9)) / sold_tokens
         else:
@@ -132,7 +130,6 @@ def min_tokens_out(launch):
         expected = Decimal(amount_raw) * (sold * Decimal(10**18)) / (raised * Decimal(10**6))
     else:
         expected = (AUTO_BUY_AMOUNT / INITIAL_FDV_USD) * Decimal(TOKEN_SUPPLY)
-    # Positive, nonzero 10% safety haircut. No zero-slippage bypass.
     return max(1, int(expected * Decimal('0.90')))
 
 
@@ -184,4 +181,3 @@ def run_once():
         state.setdefault('bought', []).append({**launch, **result, 'time': int(time.time())})
         save_state(state)
     return {'ok': result.get('ok', False), 'status': result.get('status'), 'launch': launch, 'result': result}
-
