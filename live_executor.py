@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed Arc Testnet executor for one configured Flipt curve buy.
+"""Fail-closed Arc Mainnet executor for one configured Flipt curve buy.
 
 This module never reads a key from the repository. The key must be provided as
 BURNER_PRIVATE_KEY in the Render secret environment. It supports one explicit
@@ -13,10 +13,10 @@ from decimal import Decimal
 
 from eth_account import Account
 
-RPC_URL = os.getenv('ARC_RPC_URL', 'https://rpc.testnet.arc.io')
-CHAIN_ID = int(os.getenv('CHAIN_ID', '5042002'))
-HUB = '0x4B33146F2bCc75574534374C85662f9E51C38Aca'
-USDC = '0x4F3b8005d6b3F4994a791D971bcD153E114D20c2'
+RPC_URL = os.getenv('ARC_RPC_URL', 'https://rpc.mainnet.arc.io')
+CHAIN_ID = int(os.getenv('CHAIN_ID', '5042'))
+HUB = os.getenv('FLIPT_HUB_ADDRESS', '0x8BE95b340d8EeE7b3ab2d295aDe66762fA79ef2E')
+USDC = os.getenv('USDC_ADDRESS', '0x3600000000000000000000000000000000000000')
 DRY_RUN = os.getenv('DRY_RUN', '1') == '1'
 LIVE_TRADING = os.getenv('LIVE_TRADING', '0') == '1'
 MAX_USDC_PER_LAUNCH = Decimal(os.getenv('MAX_USDC_PER_LAUNCH', '100'))
@@ -46,7 +46,7 @@ def word_uint(value):
 
 def call_rpc(method, params=None):
     body = json.dumps({'jsonrpc': '2.0', 'id': int(time.time() * 1000), 'method': method, 'params': params or []}).encode()
-    request = urllib.request.Request(RPC_URL, body, {'Content-Type': 'application/json', 'User-Agent': 'flipt-arc-testnet-operator/0.2'})
+    request = urllib.request.Request(RPC_URL, body, {'Content-Type': 'application/json', 'User-Agent': 'flipt-arc-mainnet-operator/0.3'})
     with urllib.request.urlopen(request, timeout=20) as response:
         payload = json.loads(response.read().decode())
     if 'error' in payload:
