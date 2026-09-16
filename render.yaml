@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: flipt-render-monitor
+    name: flipt-arc-mainnet-monitor
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
@@ -8,14 +8,38 @@ services:
     healthCheckPath: /health
     envVars:
       - key: ARC_RPC_URL
-        value: https://rpc.testnet.arc.io
+        value: https://rpc.mainnet.arc.io
       - key: CHAIN_ID
-        value: "5042002"
+        value: "5042"
+      - key: FLIPT_HUB_ADDRESS
+        value: 0x8BE95b340d8EeE7b3ab2d295aDe66762fA79ef2E
+      - key: USDC_ADDRESS
+        value: 0x3600000000000000000000000000000000000000
       - key: DRY_RUN
         value: "1"
       - key: LIVE_TRADING
         value: "0"
-      - key: RUN_END_AT
+      - key: AUTO_BUY_LOOP
+        value: "0"
+      - key: EXIT_CHECK_ON_TICK
+        value: "0"
+      - key: AUTO_EXIT_LIVE
+        value: "0"
+      - key: MAX_USDC_PER_LAUNCH
+        value: "550"
+      - key: AUTO_BUY_USDC_AMOUNT
+        value: "550"
+      - key: BUY_USDC_AMOUNT
+        value: "550"
+      - key: MAX_AUTO_BUYS
+        value: "54"
+      - key: AUTO_MIN_FDV_USD
+        value: "3600"
+      - key: AUTO_STATE_PATH
+        value: mainnet_auto_strategy_state.json
+      - key: BURNER_PRIVATE_KEY
         sync: false
       - key: CRON_SECRET
+        sync: false
+      - key: RUN_END_AT
         sync: false
